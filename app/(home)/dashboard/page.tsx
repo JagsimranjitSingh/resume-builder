@@ -1,6 +1,6 @@
 import React from "react";
 import AddResume from "../_components/AddResume";
-// import ResumeList from "../_components/ResumeList";
+import ResumeList from "../_components/ResumeList";
 // import TrashListBox from "../_components/TrashListBox";
 
 const Page = () => {
@@ -26,7 +26,7 @@ const Page = () => {
           </h5>
           <div className="flex flex-wrap w-full gap-5">
             <AddResume />
-            {/* <ResumeList /> */}
+            <ResumeList />
           </div>
         </div>
       </div>

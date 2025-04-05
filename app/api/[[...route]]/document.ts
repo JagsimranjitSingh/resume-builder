@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { and, desc, eq, ne } from "drizzle-orm";
+import { z } from "zod";
 import {
   createDocumentTableSchema,
   DocumentSchema,
@@ -47,6 +49,127 @@ const documentRoute = new Hono()
           {
             success: false,
             message: "Failed to create document",
+            error: error,
+          },
+          500
+        );
+      }
+    }
+  )
+  .get("all", getAuthUser, async (c) => {
+    try {
+      const user = c.get("user");
+      const userId = user.id;
+      const documents = await db
+        .select()
+        .from(documentTable)
+        .orderBy(desc(documentTable.updatedAt))
+        .where(
+          and(
+            eq(documentTable.userId, userId),
+            ne(documentTable.status, "archived")
+          )
+        );
+      return c.json({
+        success: true,
+        data: documents,
+      });
+    } catch (error) {
+      return c.json(
+        {
+          success: false,
+          message: "Failed to fetch documents",
+          error: error,
+        },
+        500
+      );
+    }
+  })
+  .get(
+    "/:documentId",
+    zValidator(
+      "param",
+      z.object({
+        documentId: z.string(),
+      })
+    ),
+    getAuthUser,
+    async (c) => {
+      try {
+        const user = c.get("user");
+        const { documentId } = c.req.valid("param");
+
+        const userId = user?.id;
+        const documentData = await db.query.documentTable.findFirst({
+          where: and(
+            eq(documentTable.userId, userId),
+            eq(documentTable.documentId, documentId)
+          ),
+          with: {
+            personalInfo: true,
+            experiences: true,
+            educations: true,
+            skills: true,
+          },
+        });
+        return c.json({
+          success: true,
+          data: documentData,
+        });
+      } catch (error) {
+        return c.json(
+          {
+            success: false,
+            message: "Failed to fetch documents",
+            error: error,
+          },
+          500
+        );
+      }
+    }
+  )
+  .get(
+    "public/doc/:documentId",
+    zValidator(
+      "param",
+      z.object({
+        documentId: z.string(),
+      })
+    ),
+    async (c) => {
+      try {
+        const { documentId } = c.req.valid("param");
+        const documentData = await db.query.documentTable.findFirst({
+          where: and(
+            eq(documentTable.status, "public"),
+            eq(documentTable.documentId, documentId)
+          ),
+          with: {
+            personalInfo: true,
+            experiences: true,
+            educations: true,
+            skills: true,
+          },
+        });
+
+        if (!documentData) {
+          return c.json(
+            {
+              error: true,
+              message: "unauthorized",
+            },
+            401
+          );
+        }
+        return c.json({
+          success: true,
+          data: documentData,
+        });
+      } catch (error) {
+        return c.json(
+          {
+            success: false,
+            message: "Failed to fetch document",
             error: error,
           },
           500

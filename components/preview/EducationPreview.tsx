@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-// import SkeletonLoader from "@/components/skeleton-loader";
+import SkeletonLoader from "@/components/skeleton-loader";
 import { INITIAL_THEME_COLOR } from "@/lib/helper";
 import { ResumeDataType } from "@/types/resume.type";
 
@@ -11,9 +11,9 @@ interface PropsType {
 const EducationPreview: FC<PropsType> = ({ resumeInfo, isLoading }) => {
   const themeColor = resumeInfo?.themeColor || INITIAL_THEME_COLOR;
 
-//   if (isLoading) {
-//     return <SkeletonLoader />;
-//   }
+  if (isLoading) {
+    return <SkeletonLoader />;
+  }
   return (
     <div className="w-full my-5">
       <h5

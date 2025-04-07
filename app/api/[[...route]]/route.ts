@@ -21,7 +21,7 @@ const routes = app.basePath("/api").route("/document", documentRoute);
 
 app.get("/", (c) => {
   return c.json({
-    message: "Hello from ResumeBuilder",
+    message: "Hello from Ai Resume!",
   });
 });
 

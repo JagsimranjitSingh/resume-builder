@@ -4,6 +4,16 @@ import React, { Fragment } from "react";
 import ResumeItem from "./common/ResumeItem";
 import useGetDocuments from "@/features/document/use-get-document";
 
+// Define or import the Resume type
+type Resume = {
+    documentId: string;
+    title: string;
+    status: string;
+    updatedAt: string;
+    themeColor: string;
+    thumbnail: string;
+};
+
 const ResumeList = () => {
     const { data, isLoading, isError, refetch } = useGetDocuments();
     const resumes = data?.data ?? [];
@@ -22,12 +32,12 @@ const ResumeList = () => {
                 </div>
             ) : (
                 <>
-                    {resumes?.map((resume) => (
+                    {resumes?.map((resume: Resume) => (
                         <ResumeItem
                             key={resume.documentId}
                             documentId={resume.documentId}
                             title={resume.title}
-                            status={resume.status}
+                            status={resume.status as "archived" | "private" | "public"}
                             updatedAt={resume.updatedAt}
                             themeColor={resume.themeColor}
                             thumbnail={resume.thumbnail}
